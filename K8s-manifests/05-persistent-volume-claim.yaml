@@ -1,0 +1,31 @@
+# PersistentVolumeClaim: A request for storage by a user
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-logs-pvc
+  namespace: nginx-demo
+  labels:
+    app: nginx
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nginx-storage
+  resources:
+    requests:
+      storage: 1Gi
+---
+# Additional PVC for nginx content
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-content-pvc
+  namespace: nginx-demo
+  labels:
+    app: nginx
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nginx-storage
+  resources:
+    requests:
+      storage: 500Mi

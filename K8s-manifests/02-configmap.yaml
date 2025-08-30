@@ -1,0 +1,85 @@
+# ConfigMap: Stores configuration data as key-value pairs
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: nginx-demo
+  labels:
+    app: nginx
+data:
+  # Custom nginx.conf
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+        
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+        
+        access_log  /var/log/nginx/access.log  main;
+        sendfile        on;
+        keepalive_timeout  65;
+        
+        server {
+            listen       80;
+            server_name  localhost;
+            
+            location / {
+                root   /usr/share/nginx/html;
+                index  index.html index.htm;
+            }
+            
+            location /health {
+                return 200 'healthy\n';
+                add_header Content-Type text/plain;
+            }
+        }
+    }
+  
+  # Custom index.html
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Kubernetes Learning Demo</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+            .container { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 10px; backdrop-filter: blur(10px); }
+            h1 { color: #fff; text-align: center; }
+            .info { background: rgba(255,255,255,0.2); padding: 20px; border-radius: 5px; margin: 20px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 Kubernetes Learning Demo</h1>
+            <div class="info">
+                <h2>Welcome to our Educational Nginx Deployment!</h2>
+                <p><strong>Pod Name:</strong> <span id="hostname">Loading...</span></p>
+                <p><strong>Namespace:</strong> nginx-demo</p>
+                <p><strong>Purpose:</strong> Demonstrating Kubernetes orchestration concepts</p>
+                <p><strong>K8s Objects Used:</strong> Namespace, ConfigMap, Secret, PV, PVC, ServiceAccount, RBAC, Deployment, Service, HPA, Ingress, NetworkPolicy, PDB</p>
+            </div>
+            <div class="info">
+                <h3>Learning Objectives:</h3>
+                <ul>
+                    <li>Understanding Pod lifecycle and management</li>
+                    <li>Service discovery and networking</li>
+                    <li>Configuration management with ConfigMaps and Secrets</li>
+                    <li>Storage orchestration with PVs and PVCs</li>
+                    <li>Security with RBAC and NetworkPolicies</li>
+                    <li>Scaling and availability with HPA and PDB</li>
+                </ul>
+            </div>
+        </div>
+        <script>
+            fetch('/hostname')
+                .then(response => response.text())
+                .then(data => document.getElementById('hostname').textContent = data)
+                .catch(() => document.getElementById('hostname').textContent = window.location.hostname);
+        </script>
+    </body>
+    </html>

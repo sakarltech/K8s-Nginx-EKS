@@ -1,0 +1,61 @@
+# Service: Exposes Pods and provides stable network identity
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: nginx-demo
+  labels:
+    app: nginx
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: nginx
+  sessionAffinity: None
+---
+# Headless Service: For service discovery without load balancing
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-headless
+  namespace: nginx-demo
+  labels:
+    app: nginx
+    service-type: headless
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: nginx
+---
+# LoadBalancer Service: Exposes the service externally
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-loadbalancer
+  namespace: nginx-demo
+  labels:
+    app: nginx
+    service-type: loadbalancer
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: nginx

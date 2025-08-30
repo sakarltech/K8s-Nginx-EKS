@@ -1,0 +1,42 @@
+# Namespace: Provides a way to organize and isolate resources
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx-demo
+  labels:
+    app: nginx-demo
+    environment: learning
+  annotations:
+    description: "Educational namespace for nginx deployment demo"
+---
+# ResourceQuota: Controls resource usage within the namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: nginx-demo-quota
+  namespace: nginx-demo
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
+    pods: "10"
+    services: "5"
+    persistentvolumeclaims: "2"
+---
+# LimitRange: Defines min/max/default resource limits for objects
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: nginx-demo-limits
+  namespace: nginx-demo
+spec:
+  limits:
+  - default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "128Mi"
+    type: Container
