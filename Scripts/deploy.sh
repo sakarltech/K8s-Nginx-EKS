@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-AWS_REGION=${AWS_REGION:-"us-west-2"}
+AWS_REGION=${AWS_REGION:-"eu-west-2"}
 CLUSTER_NAME="nginx-learning-cluster"
 
 # Function to print colored output
@@ -62,28 +62,29 @@ check_prerequisites() {
 }
 
 # Deploy infrastructure with Terraform
-deploy_infrastructure() {
-    print_status "Deploying EKS infrastructure with Terraform..."
+# deploy_infrastructure() {
+#     print_status "Deploying EKS infrastructure with Terraform..."
     
-    cd terraform
+#     cd ..
+#     cd terraform
     
-    # Initialize Terraform
-    terraform init
+#     # Initialize Terraform
+#     terraform init
     
-    # Plan the deployment
-    terraform plan -out=tfplan
+#     # Plan the deployment
+#     terraform plan -out=tfplan
     
-    # Apply the plan
-    terraform apply tfplan
+#     # Apply the plan
+#     terraform apply tfplan
     
-    # Get outputs
-    CLUSTER_NAME=$(terraform output -raw cluster_name)
-    CLUSTER_REGION=$(terraform output -raw cluster_region)
+#     # Get outputs
+#     CLUSTER_NAME=$(terraform output -raw cluster_name)
+#     CLUSTER_REGION=$(terraform output -raw cluster_region)
     
-    cd ..
+#     cd ..
     
-    print_status "Infrastructure deployed successfully ✅"
-}
+#     print_status "Infrastructure deployed successfully ✅"
+# }
 
 # Configure kubectl
 configure_kubectl() {
@@ -100,6 +101,8 @@ configure_kubectl() {
 # Install AWS Load Balancer Controller
 install_aws_load_balancer_controller() {
     print_status "Installing AWS Load Balancer Controller..."
+
+    eksctl utils associate-iam-oidc-provider --region=eu-west-2 --cluster=nginx-learning-cluster --approve
     
     # Create service account
     eksctl create iamserviceaccount \
@@ -128,6 +131,8 @@ install_aws_load_balancer_controller() {
 # Deploy Kubernetes manifests
 deploy_k8s_manifests() {
     print_status "Deploying Kubernetes manifests..."
+
+    cd ..
     
     # Apply manifests in order
     kubectl apply -f k8s-manifests/01-namespace.yaml
@@ -180,7 +185,7 @@ display_info() {
 # Main execution
 main() {
     check_prerequisites
-    deploy_infrastructure
+    # deploy_infrastructure
     configure_kubectl
     install_aws_load_balancer_controller
     deploy_k8s_manifests
